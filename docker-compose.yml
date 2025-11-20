@@ -1,0 +1,32 @@
+services:
+  api:
+    build: .
+    container_name: pokedex-api
+    environment:
+      - DB_PATH=/data/pokedex.db
+    volumes:
+      - pokedex-data:/data
+    expose:
+      - "8080"
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/log/pmtu-pokedex:/var/log/pmtu-pokedex
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./site:/srv/site:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  pokedex-data: {}
+  caddy-data: {}
+  caddy-config: {}

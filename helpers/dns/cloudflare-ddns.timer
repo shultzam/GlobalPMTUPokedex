@@ -1,0 +1,13 @@
+# /etc/systemd/system/
+
+[Unit]
+Description=Runs Cloudflare DDNS updater every 10 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=10min
+AccuracySec=30s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

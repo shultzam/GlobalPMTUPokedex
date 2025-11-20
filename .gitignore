@@ -1,19 +1,24 @@
-# Ignore database and runtime state
+# Ignore database and runtime state.
 pokedex-data/
 data/
 *.db
 
-# Ignore environment files
+# Ignore environment files.
 .env
 *.pem
 *.key
 *.crt
 
-# Python cache
+# Python cache.
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Docker artifacts
+# Docker artifacts.
 *.log
+
+# Custom adds.
+cf_ddns_config.json
+*.secret.json
+*.private.json

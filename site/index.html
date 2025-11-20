@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Global Pokédex</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main>
+    <h1>Global Pokédex</h1>
+
+    <section id="leaderboard">
+      <h2>Leaderboard</h2>
+      <table id="lb">
+        <thead>
+          <tr><th>#</th><th>Name</th><th>Steam ID</th><th>Total</th><th>Shiny</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="species">
+      <h2>Who has caught…</h2>
+      <input id="speciesName" placeholder="Alolan Raichu" />
+      <button id="lookup">Lookup</button>
+      <ul id="who"></ul>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

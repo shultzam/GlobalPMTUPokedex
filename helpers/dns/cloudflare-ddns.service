@@ -1,0 +1,23 @@
+# /etc/systemd/system/
+
+[Unit]
+Description=Cloudflare Dynamic DNS Updater for PMTU Pokedex
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/pmtu-pokedex/ddns/cf_ddns_update.py
+WorkingDirectory=/opt/pmtu-pokedex/ddns
+Environment="CF_DDNS_CONFIG=/opt/pmtu-pokedex/ddns/cf_ddns_config.json"
+
+# Restart on failure
+Restart=on-failure
+RestartSec=10
+
+# Nice readable logs
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
