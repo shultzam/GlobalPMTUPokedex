@@ -10,6 +10,7 @@ import shutil
 from datetime import datetime
 
 import requests
+from requests import Session
 
 """
 PMTU Pokédex Admin Helper
@@ -34,10 +35,10 @@ Examples of Commands
 5. View the global leaderboard
    python3 pokedex_admin.py leaderboard --limit 20
 
-6. Show all players who caught a given Pokémon
-   python3 pokedex_admin.py who-caught --pokemon "Pikachu"
-   python3 pokedex_admin.py who-caught --pokemon "Pikachu" --shiny
-   python3 pokedex_admin.py who-caught --pokemon "Pikachu" --non-shiny
+6. Show caught information for a given Pokémon
+   python3 pokedex_admin.py caught-count --pokemon "Pikachu"
+   python3 pokedex_admin.py caught-count --pokemon "Pikachu" --shiny
+   python3 pokedex_admin.py caught-count --pokemon "Pikachu" --non-shiny
 
 7. Create a backup of the SQLite database
    python3 pokedex_admin.py db-backup
@@ -59,18 +60,25 @@ Notes
 """
 
 # Default API base URL.
-DEFAULT_API_BASE = os.environ.get("POKEDEX_API_BASE", "https://pmtu-pokedex.com/api")
+DEFAULT_API_BASE = os.environ.get("POKEDEX_API_BASE", "http://127.0.0.1:8080")
 
 # Default SQLite database path.
 DEFAULT_DB_PATH = os.environ.get(
     "POKEDEX_DB_PATH",
-    "/var/lib/docker/volumes/pokedex_pokedex-data/_data/pokedex.db",
+    os.path.join(os.path.dirname(__file__), "..", "..", "data", "pokedex.db"),
 )
+
+# User-Agent to flag admin usage; matches API-side default.
+ADMIN_USER_AGENT = os.environ.get("POKEDEX_ADMIN_UA", "PMTU-Pokedex-Admin")
+
+# Shared HTTP session to carry admin User-Agent on every request.
+HTTP: Session = requests.Session()
+HTTP.headers.update({"User-Agent": ADMIN_USER_AGENT})
 
 # Performs an HTTP GET to the API health endpoint.
 def api_health(api_base):
     url = f"{api_base}/health"
-    r = requests.get(url, timeout=5)
+    r = HTTP.get(url, timeout=5)
     print(f"GET {url} -> {r.status_code}")
     print(r.text)
 
@@ -81,7 +89,7 @@ def api_register(api_base, steam_id, steam_name):
         "steam_id": steam_id,
         "steam_name": steam_name,
     }
-    r = requests.post(url, json=payload, timeout=5)
+    r = HTTP.post(url, json=payload, timeout=5)
     print(f"POST {url} -> {r.status_code}")
     if r.ok:
         print(r.json())
@@ -96,17 +104,31 @@ def api_capture(api_base, steam_id, pokemon_name, shiny):
         "pokemon_name": pokemon_name,
         "shiny": bool(shiny),
     }
-    r = requests.post(url, json=payload, timeout=5)
+    r = HTTP.post(url, json=payload, timeout=5)
     print(f"POST {url} -> {r.status_code}")
     if r.ok:
         print("Capture accepted by server")
     else:
         print(r.text)
 
+def api_uncapture(api_base, steam_id, pokemon_name):
+    url = f"{api_base}/v1/uncapture"
+    payload = {
+        "steam_id": steam_id,
+        "pokemon_name": pokemon_name,
+    }
+    r = HTTP.post(url, json=payload, timeout=5)
+    print(f"POST {url} -> {r.status_code}")
+    if r.ok:
+        data = r.json()
+        print(f"Removed {data.get('deleted', 0)} capture(s)")
+    else:
+        print(r.text)
+
 # Retrieves a player's full Pokédex via the API and prints it.
 def api_dex(api_base, steam_id):
     url = f"{api_base}/v1/dex/{steam_id}"
-    r = requests.get(url, timeout=5)
+    r = HTTP.get(url, timeout=5)
     print(f"GET {url} -> {r.status_code}")
     if not r.ok:
         print(r.text)
@@ -122,7 +144,7 @@ def api_dex(api_base, steam_id):
 # Retrieves the global leaderboard from the API.
 def api_leaderboard(api_base, limit):
     url = f"{api_base}/v1/leaderboard?limit={limit}"
-    r = requests.get(url, timeout=5)
+    r = HTTP.get(url, timeout=5)
     print(f"GET {url} -> {r.status_code}")
     if not r.ok:
         print(r.text)
@@ -135,9 +157,9 @@ def api_leaderboard(api_base, limit):
         print(f"{i:2d}) {name} ({e.get('steam_id')}) total={total} shiny={shinies}")
 
 # Shows how many players caught a given Pokémon and how many of those are shiny.
-def api_who_caught(api_base, pokemon_name):
+def api_caught_count(api_base, pokemon_name):
     url = f"{api_base}/v1/species/{requests.utils.quote(pokemon_name)}/caught"
-    r = requests.get(url, timeout=5)
+    r = HTTP.get(url, timeout=5)
     print(f"GET {url} -> {r.status_code}")
     if not r.ok:
         print(r.text)
@@ -266,13 +288,17 @@ def build_parser():
     p_cap.add_argument("--pokemon", required=True)
     p_cap.add_argument("--shiny", action="store_true")
 
+    p_uncap = sub.add_parser("uncapture", help="Remove a capture via API")
+    p_uncap.add_argument("--steam-id", required=True)
+    p_uncap.add_argument("--pokemon", required=True)
+
     p_dex = sub.add_parser("dex", help="Show a player's dex via API")
     p_dex.add_argument("--steam-id", required=True)
 
     p_lb = sub.add_parser("leaderboard", help="Show leaderboard via API")
     p_lb.add_argument("--limit", type=int, default=25)
 
-    p_wc = sub.add_parser("who-caught", help="Show who caught a Pokémon via API")
+    p_wc = sub.add_parser("caught-count", help="Show caught information for a Pokémon via API")
     p_wc.add_argument("--pokemon", required=True)
 
     sub.add_parser("db-backup", help="Backup the SQLite database")
@@ -304,12 +330,14 @@ def main():
         api_register(api_base, args.steam_id, args.steam_name)
     elif args.command == "capture":
         api_capture(api_base, args.steam_id, args.pokemon, args.shiny)
+    elif args.command == "uncapture":
+        api_uncapture(api_base, args.steam_id, args.pokemon)
     elif args.command == "dex":
         api_dex(api_base, args.steam_id)
     elif args.command == "leaderboard":
         api_leaderboard(api_base, args.limit)
-    elif args.command == "who-caught":
-        api_who_caught(api_base, args.pokemon)
+    elif args.command == "caught-count":
+        api_caught_count(api_base, args.pokemon)
     elif args.command == "db-backup":
         db_backup(db_path)
     elif args.command == "db-list-players":
@@ -329,7 +357,7 @@ def main():
 # Retrieves the "most complete" Pokédex leaderboard via the API.
 def api_leaderboard_completion(api_base, limit):
     url = f"{api_base}/v1/leaderboard/completion?limit={limit}"
-    r = requests.get(url, timeout=5)
+    r = HTTP.get(url, timeout=5)
     print(f"GET {url} -> {r.status_code}")
     if not r.ok:
         print(r.text)

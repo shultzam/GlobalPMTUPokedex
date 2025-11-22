@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Global Pokédex — Leaderboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main>
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">PMTU</p>
+        <h1>Leaderboard</h1>
+        <p class="lede">Top trainers by unique captures. Updated live from the global Pokédex.</p>
+      </div>
+      <div class="button-row">
+        <button id="homeBtn" class="ghost">Home</button>
+      </div>
+    </header>
+
+    <section id="leaderboard" class="card">
+      <div class="section-head">
+        <h2>Top 50</h2>
+        <p>Sorted by total captures, then shiny count, then name.</p>
+      </div>
+      <div class="table-wrap">
+        <table id="lb">
+          <thead>
+            <tr><th>#</th><th>Name</th><th>Total</th><th>Shiny</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="lbEmpty" class="muted" style="margin-top:0.5rem; display:none;">No players yet.</div>
+    </section>
+  </main>
+  <div class="footnote">Contact Allen Degenerous with any issues or complaints.</div>
+  <script src="/app.js"></script>
+</body>
+</html>

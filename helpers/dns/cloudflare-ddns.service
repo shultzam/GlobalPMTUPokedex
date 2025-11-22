@@ -7,9 +7,9 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /opt/pmtu-pokedex/ddns/cf_ddns_update.py
-WorkingDirectory=/opt/pmtu-pokedex/ddns
-Environment="CF_DDNS_CONFIG=/opt/pmtu-pokedex/ddns/cf_ddns_config.json"
+ExecStart=/usr/bin/python3 /home/allen/GlobalPMTUPokedex/helpers/dns/cf_ddns_update.py
+WorkingDirectory=/home/allen/GlobalPMTUPokedex/helpers/dns
+Environment="CF_DDNS_CONFIG=/home/allen/GlobalPMTUPokedex/configs/cf_ddns_config.json"
 
 # Restart on failure
 Restart=on-failure

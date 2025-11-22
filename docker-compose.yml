@@ -1,32 +1,36 @@
 services:
   api:
-    build: .
-    container_name: pokedex-api
-    environment:
-      - DB_PATH=/data/pokedex.db
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pmtu-api
+    ports:
+      - "127.0.0.1:8080:8080"
     volumes:
-      - pokedex-data:/data
+      - ./data:/data
+      - /var/log/pmtu-pokedex:/var/log/pmtu-pokedex
+    environment:
+      - POKEDEX_ENV=production
+      - DB_PATH=/data/pokedex.db
     expose:
       - "8080"
     restart: unless-stopped
 
   caddy:
-    image: caddy:2
-    container_name: caddy
+    image: caddy:latest
+    container_name: pmtu-caddy
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - /var/log/pmtu-pokedex:/var/log/pmtu-pokedex
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./site:/srv/site:ro
-      - caddy-data:/data
-      - caddy-config:/config
+      - ./caddy-data:/data
+      - ./caddy-config:/config
     depends_on:
       - api
     restart: unless-stopped
 
 volumes:
-  pokedex-data: {}
   caddy-data: {}
   caddy-config: {}

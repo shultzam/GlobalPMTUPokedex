@@ -1,9 +1,17 @@
-pmtu-pokedex.com {
+pmtu-pokedex.com, www.pmtu-pokedex.com {
   encode zstd gzip
 
-  @api path /api/*
-  handle_path @api {
-    reverse_proxy api:8080
+  log {
+    output file /data/access.log
+    format console
+  }
+
+  handle_path /api/* {
+    reverse_proxy api:8080 {
+      transport http {
+        versions 1.1
+      }
+    }
   }
 
   root * /srv/site

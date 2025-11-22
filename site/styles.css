@@ -1,8 +1,158 @@
-body { font-family: system-ui, sans-serif; margin: 2rem; }
-h1 { margin-bottom: 1rem; }
-table { border-collapse: collapse; width: 100%; }
-th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
-thead { background: #f5f5f5; }
-section { margin-top: 2rem; }
-input { padding: 0.4rem; }
-button { padding: 0.45rem 0.8rem; }
+ :root {
+  --bg: #0b1021;
+  --card: #121932;
+  --card-border: #1f2a4d;
+  --text: #e6edf7;
+  --muted: #9aa3c2;
+  --accent: #ffb703;
+  --accent-2: #66d9e8;
+  --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  --radius: 10px;
+}
+
+body {
+  font-family: "Manrope", "Work Sans", system-ui, sans-serif;
+  margin: 0;
+  padding: 2rem;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 183, 3, 0.06), transparent 32%),
+    radial-gradient(circle at 80% 8%, rgba(102, 217, 232, 0.05), transparent 28%),
+    #0b1021;
+  color: var(--text);
+  min-height: 100vh;
+}
+
+main { max-width: 1100px; margin: 0 auto; }
+
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-right: 8rem;
+}
+
+.page-head > div { flex: 1; }
+
+.button-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.eyebrow { text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0; font-size: 0.85rem; }
+.lede { max-width: none; color: var(--muted); margin-top: 0.4rem; }
+
+h1 { margin: 0.1rem 0; font-size: 2.4rem; letter-spacing: 0.01em; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow);
+  animation: fadeUp 220ms ease;
+}
+
+.section-head { margin-bottom: 0.75rem; }
+.section-head h2 { margin: 0; }
+.section-head p { margin: 0.25rem 0 0; color: var(--muted); }
+
+.control-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+input {
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: #0f162c;
+  color: var(--text);
+  min-width: 250px;
+  font-size: 1rem;
+}
+
+button {
+  padding: 0.55rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: linear-gradient(135deg, var(--accent), #f08c00);
+  color: #1a1a1a;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+
+button:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2); }
+button:active { transform: translateY(0); box-shadow: none; }
+
+button.ghost {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.result { margin-top: 0.75rem; color: var(--text); }
+.result .muted { color: var(--muted); }
+.result .captures { margin-top: 0.5rem; }
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.9rem;
+  margin-left: 0.3rem;
+}
+.badge.shiny::before {
+  content: "✦ ";
+  color: var(--accent);
+}
+
+table { border-collapse: collapse; width: 100%; color: var(--text); }
+th, td { border: 1px solid var(--card-border); padding: 0.5rem; text-align: left; }
+thead { background: rgba(255, 255, 255, 0.04); }
+tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+tbody tr:hover { background: rgba(102, 217, 232, 0.08); }
+.table-wrap { overflow-x: auto; }
+
+section { margin-top: 1.5rem; }
+
+.footnote {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  background: rgba(17, 24, 39, 0.9);
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.24);
+  z-index: 100;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  body { padding: 1.2rem; }
+  .page-head {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-right: 0;
+  }
+  .button-row {
+    position: static;
+    margin-top: 0.5rem;
+  }
+  h1 { font-size: 2rem; }
+}

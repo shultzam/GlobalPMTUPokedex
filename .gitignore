@@ -2,6 +2,8 @@
 pokedex-data/
 data/
 *.db
+caddy-data/
+caddy-config/
 
 # Ignore environment files.
 .env
@@ -22,3 +24,4 @@ __pycache__/
 cf_ddns_config.json
 *.secret.json
 *.private.json
+*.code-workspace

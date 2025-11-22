@@ -8,25 +8,43 @@
 </head>
 <body>
   <main>
-    <h1>Global Pokédex</h1>
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">PMTU</p>
+        <h1>Global Pokédex</h1>
+        <p class="lede">Find your rank, browse the leaderboard, and check how many trainers have caught each Pokémon. Progress is tracked across all PMTU playthroughs.</p>
+      </div>
+      <div class="button-row">
+        <button id="jumpLeaderboard" class="ghost">View Leaderboard</button>
+      </div>
+    </header>
 
-    <section id="leaderboard">
-      <h2>Leaderboard</h2>
-      <table id="lb">
-        <thead>
-          <tr><th>#</th><th>Name</th><th>Steam ID</th><th>Total</th><th>Shiny</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <section id="player-search" class="card">
+      <div class="section-head">
+        <h2>Player search</h2>
+        <p>Look up by Steam name or Steam ID.</p>
+      </div>
+      <div class="control-row">
+        <input id="playerQuery" placeholder="Steam name or Steam ID" />
+        <button id="playerLookup">Search</button>
+      </div>
+      <div id="playerResult" class="result"></div>
     </section>
 
-    <section id="species">
-      <h2>Who has caught…</h2>
-      <input id="speciesName" placeholder="Alolan Raichu" />
-      <button id="lookup">Lookup</button>
-      <ul id="who"></ul>
+    <section id="species" class="card">
+      <div class="section-head">
+        <h2>Pokémon search</h2>
+        <p>See how many players have caught a specific Pokémon.</p>
+      </div>
+      <div class="control-row">
+        <input id="speciesName" list="speciesList" placeholder="Alolan Raichu" />
+        <datalist id="speciesList"></datalist>
+        <button id="lookup">Lookup</button>
+      </div>
+      <div id="speciesResult" class="result"></div>
     </section>
   </main>
+  <div class="footnote">Contact Allen Degenerous with any issues or complaints.</div>
   <script src="/app.js"></script>
 </body>
 </html>
