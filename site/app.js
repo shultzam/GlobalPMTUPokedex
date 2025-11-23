@@ -4,6 +4,7 @@ const lbEmpty = document.getElementById("lbEmpty");
 const playerResult = document.getElementById("playerResult");
 const speciesResult = document.getElementById("speciesResult");
 const speciesList = document.getElementById("speciesList");
+const leaderboardCache = new Map();
 
 function td(txt) { const e = document.createElement("td"); e.textContent = txt; return e; }
 function escapeHtml(str) {
@@ -19,6 +20,82 @@ function escapeHtml(str) {
 function setResult(el, html, isError = false) {
   el.innerHTML = html;
   el.classList.toggle("muted", isError);
+}
+
+function renderCaptureBadges(captures) {
+  if (!captures || captures.length === 0) {
+    return "<span class='muted'>No captures yet.</span>";
+  }
+  return captures
+    .map((c) => {
+      const classes = ["badge"];
+      if (c.shiny) classes.push("shiny");
+      return `<span class="${classes.join(" ")}">${escapeHtml(c.pokemon_name)}</span>`;
+    })
+    .join(" ");
+}
+
+async function fetchPlayerDex(steamId) {
+  if (leaderboardCache.has(steamId)) {
+    return leaderboardCache.get(steamId);
+  }
+  const res = await fetch(`${api}/v1/dex/${encodeURIComponent(steamId)}`);
+  if (!res.ok) throw new Error("Failed to fetch dex");
+  const data = await res.json();
+  leaderboardCache.set(steamId, data);
+  return data;
+}
+
+function buildDetailContent(data, rank, fallbackTotals) {
+  const safeName = data.steam_name_safe ?? data.steam_name ?? data.steam_id;
+  const total = data.count ?? fallbackTotals.total ?? 0;
+  const shinies = data.shiny_count ?? fallbackTotals.shinies ?? 0;
+  const capturesList = renderCaptureBadges(data.captures);
+
+  return `
+    <div class="lb-detail-head">
+      <div>
+        <div class="player">
+          <strong>${escapeHtml(safeName)}</strong>
+          <span class="muted">(${escapeHtml(data.steam_id)})</span>
+        </div>
+        <div class="muted">Rank #${rank} · Total ${total} · Shiny ${shinies}</div>
+      </div>
+      <div class="muted">Click row to collapse</div>
+    </div>
+    <div class="captures lb-captures">${capturesList}</div>
+  `;
+}
+
+async function toggleLeaderboardRow(tr, entry) {
+  const alreadyExpanded = tr.classList.contains("expanded");
+  const next = tr.nextElementSibling;
+  if (alreadyExpanded) {
+    if (next && next.classList.contains("lb-details")) next.remove();
+    tr.classList.remove("expanded");
+    return;
+  }
+
+  const detailRow = document.createElement("tr");
+  detailRow.classList.add("lb-details");
+  const detailTd = document.createElement("td");
+  detailTd.colSpan = 4;
+  detailTd.innerHTML = "<span class='muted'>Loading captures…</span>";
+  detailRow.appendChild(detailTd);
+
+  if (next && next.classList.contains("lb-details")) next.remove();
+  tr.after(detailRow);
+  tr.classList.add("expanded");
+
+  try {
+    const data = await fetchPlayerDex(entry.steam_id);
+    detailTd.innerHTML = buildDetailContent(data, entry.rank, {
+      total: entry.total,
+      shinies: entry.shinies,
+    });
+  } catch (err) {
+    detailTd.innerHTML = "<span class='muted'>Could not load captures right now.</span>";
+  }
 }
 
 async function loadLeaderboard() {
@@ -39,11 +116,17 @@ async function loadLeaderboard() {
   lbEmpty && (lbEmpty.style.display = "none");
   data.entries.forEach((e, i) => {
     const tr = document.createElement("tr");
+    tr.classList.add("lb-row");
     const name = e.steam_name_safe ?? e.steam_name ?? e.steam_id;
     tr.appendChild(td(i + 1));
-    tr.appendChild(td(name));
+    const nameCell = td(name);
+    nameCell.classList.add("lb-name");
+    nameCell.title = "Click to view captures";
+    tr.appendChild(nameCell);
     tr.appendChild(td(e.total ?? 0));
     tr.appendChild(td(e.shinies ?? 0));
+    const entry = { ...e, rank: i + 1 };
+    tr.addEventListener("click", () => toggleLeaderboardRow(tr, entry));
     lbBody.appendChild(tr);
   });
 }
@@ -65,10 +148,7 @@ async function searchPlayer() {
     const data = await res.json();
     const safeName = data.steam_name_safe ?? data.steam_name ?? "Unknown";
 
-    const capturesList = data.captures.map(c => {
-      const shiny = c.shiny ? "✨ " : "";
-      return `<span class="badge">${shiny}${escapeHtml(c.pokemon_name)}</span>`;
-    }).join(" ");
+    const capturesList = renderCaptureBadges(data.captures);
 
     setResult(playerResult, `
       <div class="player">
@@ -106,9 +186,24 @@ async function lookupSpecies(name) {
       return;
     }
     const data = await res.json();
+    const baseLine = `${escapeHtml(data.pokemon_name)}: ${data.total_players ?? 0} players · ${data.shiny_players ?? 0} shiny`;
+    let firstLine = "";
+    if (data.first_caught_by_id && data.first_caught_at) {
+      const firstName = escapeHtml(
+        data.first_caught_by_name_safe ?? data.first_caught_by_name ?? data.first_caught_by_id
+      );
+      let when = data.first_caught_at;
+      try {
+        when = new Date(data.first_caught_at).toLocaleDateString();
+      } catch (_) {
+        // Fall back to raw value if parsing fails.
+        when = data.first_caught_at;
+      }
+      firstLine = `<div class="muted">First caught by ${firstName} on ${escapeHtml(when)}</div>`;
+    }
     setResult(
       speciesResult,
-      `${escapeHtml(data.pokemon_name)}: ${data.total_players ?? 0} players · ${data.shiny_players ?? 0} shiny`
+      `<div>${baseLine}</div>${firstLine}`
     );
   } catch (err) {
     setResult(speciesResult, `${escapeHtml(name)} not found.`, true);

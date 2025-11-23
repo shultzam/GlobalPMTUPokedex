@@ -121,6 +121,23 @@ thead { background: rgba(255, 255, 255, 0.04); }
 tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
 tbody tr:hover { background: rgba(102, 217, 232, 0.08); }
 .table-wrap { overflow-x: auto; }
+.lb-row { cursor: pointer; }
+.lb-row.expanded { background: rgba(102, 217, 232, 0.12); }
+.lb-details td { background: rgba(255, 255, 255, 0.04); border-top: none; }
+.lb-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.25rem;
+}
+.lb-captures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.lb-captures .badge { margin: 0; }
 
 section { margin-top: 1.5rem; }
 

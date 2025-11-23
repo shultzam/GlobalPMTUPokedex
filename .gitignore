@@ -20,6 +20,9 @@ __pycache__/
 # Docker artifacts.
 *.log
 
+# Backups.
+backups/
+
 # Custom adds.
 cf_ddns_config.json
 *.secret.json

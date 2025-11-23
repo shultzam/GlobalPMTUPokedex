@@ -634,6 +634,23 @@ def caught_count(pokemon_name: str):
     )
 
     row = cur.fetchone()
+
+    cur.execute(
+        """
+        SELECT
+          c.steam_id,
+          p.steam_name,
+          p.steam_name_safe,
+          c.captured_at
+        FROM captures c
+        JOIN players p ON p.steam_id = c.steam_id
+        WHERE c.pokemon_name = ?
+        ORDER BY c.captured_at ASC
+        LIMIT 1
+        """,
+        (pokemon_name,),
+    )
+    first_row = cur.fetchone()
     conn.close()
 
     total_players = row["total_players"] or 0
@@ -642,7 +659,11 @@ def caught_count(pokemon_name: str):
     return {
         "pokemon_name": pokemon_name,
         "total_players": total_players,
-        "shiny_players": shiny_players
+        "shiny_players": shiny_players,
+        "first_caught_by_id": first_row["steam_id"] if first_row else None,
+        "first_caught_by_name": first_row["steam_name"] if first_row else None,
+        "first_caught_by_name_safe": first_row["steam_name_safe"] if first_row else None,
+        "first_caught_at": first_row["captured_at"] if first_row else None,
     }
 
 @app.get("/v1/species/search")
