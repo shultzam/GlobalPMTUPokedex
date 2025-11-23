@@ -23,6 +23,9 @@ __pycache__/
 # Backups.
 backups/
 
+# Node dependencies.
+node_modules/
+
 # Custom adds.
 cf_ddns_config.json
 *.secret.json
