@@ -15,6 +15,7 @@
         <p class="lede">Find your rank, browse the leaderboard, and check how many trainers have caught each Pokémon. Progress is tracked across all PMTU playthroughs.</p>
       </div>
       <div class="button-row">
+        <button id="aboutBtn" class="ghost" data-about-open>About</button>
         <button id="jumpLeaderboard" class="ghost">View Leaderboard</button>
       </div>
     </header>
@@ -44,6 +45,22 @@
       <div id="speciesResult" class="result"></div>
     </section>
   </main>
+  <div id="aboutModal" class="about-modal" aria-hidden="true">
+    <div class="about-card" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+      <div class="about-head">
+        <div>
+          <p class="eyebrow">About</p>
+          <h3 id="aboutTitle">PMTU Global Pokédex</h3>
+        </div>
+        <button id="aboutClose" class="icon-btn" aria-label="Close about dialog">Close</button>
+      </div>
+      <p>This tool tracks captures across all PMTU playthroughs. Use the links below to jump into the community or the mod page, and list out anyone who helped build it.</p>
+      <ul class="about-links">
+        <li><a href="https://discord.gg/S7aRZuKD" target="_blank" rel="noreferrer">Discord channel</a> — share feedback and get updates.</li>
+        <li><a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3221755457" target="_blank" rel="noreferrer">Steam Workshop mod</a> — view patch notes, subscribe and rate it 👍.</li>
+      </ul>
+    </div>
+  </div>
   <div class="footnote">Contact Allen Degenerous with any issues or complaints.</div>
   <script src="/app.js"></script>
 </body>

@@ -115,6 +115,14 @@ button.ghost {
   color: var(--accent);
 }
 
+a {
+  color: var(--accent-2);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a:hover { text-decoration: underline; }
+
 table { border-collapse: collapse; width: 100%; color: var(--text); }
 th, td { border: 1px solid var(--card-border); padding: 0.5rem; text-align: left; }
 thead { background: rgba(255, 255, 255, 0.04); }
@@ -154,6 +162,59 @@ section { margin-top: 1.5rem; }
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.24);
   z-index: 100;
 }
+
+.about-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 11, 25, 0.8);
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease;
+  z-index: 250;
+}
+
+.about-modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.about-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  box-shadow: var(--shadow);
+  max-width: 520px;
+  width: min(520px, 100%);
+}
+
+.about-card h3 { margin: 0.15rem 0; }
+.about-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.icon-btn {
+  background: transparent;
+  color: var(--muted);
+  border-color: var(--card-border);
+  padding: 0.35rem 0.65rem;
+}
+
+.icon-btn:hover { color: var(--text); }
+
+.about-links {
+  padding-left: 1.1rem;
+  margin: 0.75rem 0 0;
+}
+
+.about-links li + li { margin-top: 0.4rem; }
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(6px); }

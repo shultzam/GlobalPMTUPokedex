@@ -266,5 +266,33 @@ if (homeBtn) {
   });
 }
 
+const aboutModal = document.getElementById("aboutModal");
+const aboutCloseBtn = document.getElementById("aboutClose");
+const aboutOpenBtns = document.querySelectorAll("[data-about-open]");
+
+function openAbout() {
+  if (!aboutModal) return;
+  aboutModal.classList.add("show");
+  aboutModal.setAttribute("aria-hidden", "false");
+}
+
+function closeAbout() {
+  if (!aboutModal) return;
+  aboutModal.classList.remove("show");
+  aboutModal.setAttribute("aria-hidden", "true");
+}
+
+aboutOpenBtns.forEach((btn) => btn.addEventListener("click", openAbout));
+if (aboutCloseBtn) aboutCloseBtn.addEventListener("click", closeAbout);
+if (aboutModal) {
+  aboutModal.addEventListener("click", (e) => {
+    if (e.target === aboutModal) closeAbout();
+  });
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeAbout();
+});
+
 loadLeaderboard();
 loadSpeciesOptions();
